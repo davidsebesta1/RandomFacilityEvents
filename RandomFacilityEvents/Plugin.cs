@@ -16,9 +16,14 @@ namespace RandomFacilityEvents.Plugin
 {
     internal class Plugin
     {
+        //Variables
+        private Random random = new Random();
+
+        //Config variable
         [PluginConfig]
         public Config config;
 
+        //Entry point
         [PluginEntryPoint("RandomFacilityEvents", "0.0.1", "Spawns random events around facility", "davidsebesta")]
         public void Startup()
         {
@@ -29,12 +34,12 @@ namespace RandomFacilityEvents.Plugin
             }
         }
 
+        //Round started method
         [PluginEvent(ServerEventType.RoundStart)]
         public void RoundStart()
         {
             if (config.RandomItemSpawn)
             {
-                Random random = new Random();
 
                 int TotalItemsToSpawn = config.RandomItemSpawnAmount + random.Next(config.MaximumAdditionalRandomAmount);
 
@@ -54,6 +59,7 @@ namespace RandomFacilityEvents.Plugin
             }
         }
 
+        //Spawn item at specified room location
         private void SpawnItemAtRoom(ItemType itemType, FacilityRoom room)
         {
             var item = Server.Instance.ReferenceHub.inventory.ServerAddItem(itemType);
@@ -62,7 +68,7 @@ namespace RandomFacilityEvents.Plugin
             if (itemPickup != null)
             {
                 itemPickup.transform.position = room.Position;
-                itemPickup.transform.rotation = Quaternion.identity;
+                itemPickup.transform.rotation = Quaternion.identity + Quaternion.EulerRotation(Random.);
             }
 
             Log.Info("Spawned " + itemType + " at " + room.Position + " which is "  + room.Identifier);

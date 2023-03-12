@@ -25,6 +25,8 @@ namespace RandomFacilityEvents.Plugin
         public bool RandomItemSpawn { get; set; } = true;
         [Description("Amount of items to spawn around facility")]
         public int RandomItemSpawnAmount { get; set; } = 5;
+        [Description("Do 'accidents' happen (spawn dead bodies)")]
+        public bool accidentsSpawn { get; set; } = true;
         [Description("Randomized add to items")]
         public int MaximumAdditionalRandomAmount { get; set; } = 0;
     }
