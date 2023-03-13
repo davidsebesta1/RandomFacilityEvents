@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using PluginAPI.Core.Zones;
 using MEC;
 using UnityEngine;
-using Random = System.Random;
+using Random = UnityEngine.Random;
 using InventorySystem;
 using InventorySystem.Items.Pickups;
 using PlayerRoles;
@@ -56,14 +56,14 @@ namespace RandomFacilityEvents.Plugin
             if (config.RandomItemSpawn)
             {
 
-                int TotalItemsToSpawn = config.RandomItemSpawnAmount + random.Next(config.MaximumAdditionalRandomAmount);
+                int TotalItemsToSpawn = config.RandomItemSpawnAmount + Random.Range(0, config.MaximumAdditionalRandomAmount);
 
                 Timing.CallDelayed(1f, (Action)(() =>
                 {
                     List<FacilityRoom> rooms = Facility.Rooms;
                     for (int i = 0; i < TotalItemsToSpawn; i++)
                     {
-                        FacilityRoom room = rooms[random.Next(rooms.Count)];
+                        FacilityRoom room = rooms[Random.Range(0, rooms.Count)];
 
                         events[0].RunEvent(null, ItemType.Coin, room, null);
                     }
@@ -87,36 +87,36 @@ namespace RandomFacilityEvents.Plugin
         {
             Log.Info("Blackout timer has started");
             List<FacilityRoom> rooms = Facility.Rooms;
-            int delay = random.Next(config.MinBlackoutDelay, config.MaxBlackoutDelay);
+            int delay = Random.Range(config.MinBlackoutDelay, config.MaxBlackoutDelay);
             Log.Info("delay: " + delay + ", min: " + config.MinBlackoutDelay + ", max: " + config.MaxBlackoutDelay);
             yield return Timing.WaitForSeconds(delay);
 
             while (Round.IsRoundStarted)
             {
-                FacilityRoom room = rooms[random.Next(rooms.Count)];
+                FacilityRoom room = rooms[Random.Range(0, rooms.Count)];
 
                 if (config.RandomZoneBlackouts)
                 {
-                    bool commenceZoneWideBlackout = random.Next(10) > 0;
+                    bool commenceZoneWideBlackout = Random.Range(0, 10) > 0;
 
                     if (commenceZoneWideBlackout)
                     {
                         events[2].RunEvent(null, ItemType.None, null, null);
                     } else if (config.RandomRoomBlackouts)
                     {
-                        FacilityRoom randomRoom = rooms[random.Next(rooms.Count)];
+                        FacilityRoom randomRoom = rooms[Random.Range(0, rooms.Count)];
                         events[1].RunEvent(null, ItemType.None, randomRoom, null);
                     }
                 } 
                 else
                 {
-                    FacilityRoom randomRoom = rooms[random.Next(rooms.Count)];
+                    FacilityRoom randomRoom = rooms[Random.Range(0, rooms.Count)];
                     events[1].RunEvent(null, ItemType.None, randomRoom, null);
                 }
 
-                delay = random.Next(config.MinBlackoutDelay, config.MaxBlackoutDelay);
+                delay = Random.Range(config.MinBlackoutDelay, config.MaxBlackoutDelay);
                 Log.Info("delay: " + delay + ", min: " + config.MinBlackoutDelay + ", max: " + config.MaxBlackoutDelay);
-                yield return Timing.WaitForSeconds(random.Next(config.MinBlackoutDelay, config.MaxBlackoutDelay));
+                yield return Timing.WaitForSeconds(Random.Range(config.MinBlackoutDelay, config.MaxBlackoutDelay));
             }
         }
 

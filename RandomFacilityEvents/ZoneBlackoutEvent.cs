@@ -6,6 +6,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MEC;
+using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace RandomFacilityEvents.Plugin
 {
@@ -35,8 +37,7 @@ namespace RandomFacilityEvents.Plugin
             else
             {
 
-                System.Random random = new System.Random();
-                int zoneID = random.Next(4);
+                int zoneID = Random.Range(0,3);
 
                 switch (zoneID)
                 {

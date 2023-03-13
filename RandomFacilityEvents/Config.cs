@@ -18,9 +18,9 @@ namespace RandomFacilityEvents.Plugin
         [Description("Randomized blackouts around facility rooms")]
         public bool RandomRoomBlackouts { get; set; } = true; // true default
         [Description("Minimum time between random blackouts in seconds")]
-        public int MinBlackoutDelay { get; set; } = 120; // 180 default
+        public int MinBlackoutDelay { get; set; } = 180; // 180 default
         [Description("Maximum time between random blackouts in seconds")]
-        public int MaxBlackoutDelay { get; set; } = 180; // 240 default
+        public int MaxBlackoutDelay { get; set; } = 240; // 240 default
         [Description("Room blackout time")]
         public int RoomBlackoutTime { get; set; } = 15; // 15 default
 
