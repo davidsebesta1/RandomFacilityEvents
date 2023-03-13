@@ -10,6 +10,7 @@ using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using PluginAPI.Core.Doors;
 
 namespace RandomFacilityEvents.Plugins 
 {
@@ -21,7 +22,7 @@ namespace RandomFacilityEvents.Plugins
                 
     }
 
-    public override bool RunEvent(Player player, ItemType itemType, FacilityRoom room, FacilityZone zone)
+    public override bool RunEvent(Player player = null, ItemType itemType = ItemType.None, FacilityRoom room = null, FacilityZone zone = null, FacilityDoor door = null)
         {
             Log.Info("Random Item spawn event has started");
             System.Random random = new System.Random();

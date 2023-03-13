@@ -10,6 +10,7 @@ using PluginAPI.Core.Zones;
 using InventorySystem.Items.Pickups;
 using InventorySystem;
 using UnityEngine;
+using PluginAPI.Core.Doors;
 
 namespace RandomFacilityEvents.Plugin
 {
@@ -20,7 +21,7 @@ namespace RandomFacilityEvents.Plugin
             this.config = config;
         }
 
-        public virtual bool RunEvent(Player player, ItemType itemType, FacilityRoom room, FacilityZone zone)
+        public virtual bool RunEvent(Player player = null, ItemType itemType = ItemType.None, FacilityRoom room = null, FacilityZone zone = null, FacilityDoor door = null)
         {
             return true;
         }

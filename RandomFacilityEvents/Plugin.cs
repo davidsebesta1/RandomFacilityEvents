@@ -50,12 +50,9 @@ namespace RandomFacilityEvents.Plugin
         [PluginEvent(ServerEventType.RoundStart)]
         public void RoundStart()
         {
-
-
             //Random items spawn
             if (config.RandomItemSpawn)
             {
-
                 int TotalItemsToSpawn = config.RandomItemSpawnAmount + Random.Range(0, config.MaximumAdditionalRandomAmount);
 
                 Timing.CallDelayed(1f, (Action)(() =>
@@ -65,7 +62,7 @@ namespace RandomFacilityEvents.Plugin
                     {
                         FacilityRoom room = rooms[Random.Range(0, rooms.Count)];
 
-                        events[0].RunEvent(null, ItemType.Coin, room, null);
+                        events[0].RunEvent(itemType: ItemType.Coin, room: room);
                     }
 
                 }));
@@ -87,31 +84,34 @@ namespace RandomFacilityEvents.Plugin
         {
             Log.Info("Blackout timer has started");
             List<FacilityRoom> rooms = Facility.Rooms;
-            int delay = Random.Range(config.MinBlackoutDelay, config.MaxBlackoutDelay);
-            Log.Info("delay: " + delay + ", min: " + config.MinBlackoutDelay + ", max: " + config.MaxBlackoutDelay);
-            yield return Timing.WaitForSeconds(delay);
 
+            int delay = Random.Range(config.MinBlackoutDelay, config.MaxBlackoutDelay) + config.BlackoutBeginDelay;
+            Log.Info("delay: " + delay + ", min: " + config.MinBlackoutDelay + ", max: " + config.MaxBlackoutDelay);
+
+            yield return Timing.WaitForSeconds(delay); // initial blackout event delay
+
+            //Blackout events loop
             while (Round.IsRoundStarted)
             {
                 FacilityRoom room = rooms[Random.Range(0, rooms.Count)];
 
-                if (config.RandomZoneBlackouts)
+                if (config.RandomZoneBlackouts) // zone blackouts enabled
                 {
-                    bool commenceZoneWideBlackout = Random.Range(0, 10) > 0;
+                    bool commenceZoneWideBlackout = Random.Range(0, 10) > 7;
 
-                    if (commenceZoneWideBlackout)
+                    if (commenceZoneWideBlackout) // randomly zone blackouts
                     {
-                        events[2].RunEvent(null, ItemType.None, null, null);
-                    } else if (config.RandomRoomBlackouts)
+                        events[2].RunEvent();
+                    } else if (config.RandomRoomBlackouts) // randomly room blackouts
                     {
                         FacilityRoom randomRoom = rooms[Random.Range(0, rooms.Count)];
-                        events[1].RunEvent(null, ItemType.None, randomRoom, null);
+                        events[1].RunEvent(room: randomRoom);
                     }
                 } 
-                else
+                else // zone blackouts disabled
                 {
                     FacilityRoom randomRoom = rooms[Random.Range(0, rooms.Count)];
-                    events[1].RunEvent(null, ItemType.None, randomRoom, null);
+                    events[1].RunEvent(room: randomRoom);
                 }
 
                 delay = Random.Range(config.MinBlackoutDelay, config.MaxBlackoutDelay);

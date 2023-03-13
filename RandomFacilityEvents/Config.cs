@@ -14,6 +14,10 @@ namespace RandomFacilityEvents.Plugin
         [Description("Is plugin enabled")]
         public bool IsEnabled { get; set; } = true; // true default
 
+        //Main variables
+        [Description("Begin blackout delay in seconds")]
+        public int BlackoutBeginDelay { get; set; } = 30; // 300 default
+
         //Room related randomization
         [Description("Randomized blackouts around facility rooms")]
         public bool RandomRoomBlackouts { get; set; } = true; // true default
