@@ -12,22 +12,32 @@ namespace RandomFacilityEvents.Plugin
     {
         //Plugin enable
         [Description("Is plugin enabled")]
-        public bool IsEnabled { get; set; } = true;
+        public bool IsEnabled { get; set; } = true; // true default
 
         //Room related randomization
         [Description("Randomized blackouts around facility rooms")]
-        public bool RandomRoomBlackouts { get; set; } = true;
+        public bool RandomRoomBlackouts { get; set; } = true; // true default
+        [Description("Minimum time between random blackouts in seconds")]
+        public int MinBlackoutDelay { get; set; } = 120; // 180 default
+        [Description("Maximum time between random blackouts in seconds")]
+        public int MaxBlackoutDelay { get; set; } = 180; // 240 default
+        [Description("Room blackout time")]
+        public int RoomBlackoutTime { get; set; } = 15; // 15 default
+
+        //Zone related blackout randomization
         [Description("Randomized zone-wide blackouts")]
-        public bool RandomZoneBlackouts { get; set; } = true;
+        public bool RandomZoneBlackouts { get; set; } = true; // true default
+        [Description("ZoneBlackoutDuration")]
+        public int ZoneBlackoutTime { get; set; } = 30; // 30 default
 
         //Item related randomization
         [Description("Spawn random items around facility")]
-        public bool RandomItemSpawn { get; set; } = true;
+        public bool RandomItemSpawn { get; set; } = true; // true default
         [Description("Amount of items to spawn around facility")]
-        public int RandomItemSpawnAmount { get; set; } = 5;
+        public int RandomItemSpawnAmount { get; set; } = 5; // 5 default
         [Description("Do 'accidents' happen (spawn dead bodies)")]
-        public bool accidentsSpawn { get; set; } = true;
+        public bool accidentsSpawn { get; set; } = true; // true default
         [Description("Randomized add to items")]
-        public int MaximumAdditionalRandomAmount { get; set; } = 0;
+        public int MaximumAdditionalRandomAmount { get; set; } = 0; // 0 default
     }
 }

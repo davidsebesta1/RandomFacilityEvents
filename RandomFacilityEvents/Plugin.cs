@@ -17,6 +17,7 @@ using Mirror;
 using MapGeneration;
 using Footprinting;
 using System.Diagnostics;
+using RandomFacilityEvents.Plugins;
 
 namespace RandomFacilityEvents.Plugin
 {
@@ -24,6 +25,7 @@ namespace RandomFacilityEvents.Plugin
     {
         //Variables
         private readonly Random random = new Random();
+        private Dictionary<int, BaseFacilityEvent> events = new Dictionary<int, BaseFacilityEvent>();
 
         //Config variable
         [PluginConfig]
@@ -37,6 +39,10 @@ namespace RandomFacilityEvents.Plugin
             if(config.IsEnabled)
             {
                 EventManager.RegisterEvents((object)this);
+
+                events.Add(0, new RandomItemEvent(config));
+                events.Add(1, new RoomBlackoutEvent(config));
+                events.Add(2, new ZoneBlackoutEvent(config));
             }
         }
 
@@ -44,6 +50,9 @@ namespace RandomFacilityEvents.Plugin
         [PluginEvent(ServerEventType.RoundStart)]
         public void RoundStart()
         {
+
+
+            //Random items spawn
             if (config.RandomItemSpawn)
             {
 
@@ -56,56 +65,60 @@ namespace RandomFacilityEvents.Plugin
                     {
                         FacilityRoom room = rooms[random.Next(rooms.Count)];
 
-                        SpawnAccidentAtRoom(ItemType.GunE11SR, room);
-                        SpawnItemAtRoom(ItemType.KeycardGuard, room);
+                        events[0].RunEvent(null, ItemType.Coin, room, null);
                     }
 
                 }));
 
             }
-        }
 
-        //Spawn item at specified room location
-        private void SpawnItemAtRoom(ItemType itemType, FacilityRoom room)
-        {
-            var item = Server.Instance.ReferenceHub.inventory.ServerAddItem(itemType);
-            ItemPickupBase itemPickup = item.ServerDropItem();
 
-            if (itemPickup != null)
+            //Room related blackout coroutine
+            if(config.RandomRoomBlackouts || config.RandomZoneBlackouts)
             {
-                itemPickup.transform.position = room.Position + Vector3.up * 2;
-                itemPickup.transform.rotation = Quaternion.Euler(random.Next(360), 0, 0);
-
-                Log.Info("Spawned " + itemType + " at " + room.Position + " which is "  + room.Identifier);
-            }
-
-        }
-
-        //Spawn item with dead body at specified room location
-        private void SpawnAccidentAtRoom(ItemType itemType, FacilityRoom room)
-        {
-            try
-            {
-                SpawnItemAtRoom(itemType, room);
-
-                Log.Info("Player info: ");
-
-                Log.Info("Obj info: ");
-
-                Log.Info("Spawned a dead body at " + room.Position + " which is at " + room.Identifier);
-            } catch(Exception ex)
-            {
-                Log.Info(ex.ToString());
-
-                // Get stack trace for the exception with source file information
-                var st = new StackTrace(ex, true);
-                // Get the top stack frame
-                var frame = st.GetFrame(0);
-                // Get the line number from the stack frame
-                var line = frame.GetFileLineNumber();
-
-                Log.Info("Exception at: " + line);
+                Timing.CallDelayed(1f, (Action)(() =>
+                {
+                    Timing.RunCoroutine(RandomBlackoutEnumerator());
+                }));
             }
         }
+
+        private IEnumerator<float> RandomBlackoutEnumerator()
+        {
+            Log.Info("Blackout timer has started");
+            List<FacilityRoom> rooms = Facility.Rooms;
+            int delay = random.Next(config.MinBlackoutDelay, config.MaxBlackoutDelay);
+            Log.Info("delay: " + delay + ", min: " + config.MinBlackoutDelay + ", max: " + config.MaxBlackoutDelay);
+            yield return Timing.WaitForSeconds(delay);
+
+            while (Round.IsRoundStarted)
+            {
+                FacilityRoom room = rooms[random.Next(rooms.Count)];
+
+                if (config.RandomZoneBlackouts)
+                {
+                    bool commenceZoneWideBlackout = random.Next(10) > 0;
+
+                    if (commenceZoneWideBlackout)
+                    {
+                        events[2].RunEvent(null, ItemType.None, null, null);
+                    } else if (config.RandomRoomBlackouts)
+                    {
+                        FacilityRoom randomRoom = rooms[random.Next(rooms.Count)];
+                        events[1].RunEvent(null, ItemType.None, randomRoom, null);
+                    }
+                } 
+                else
+                {
+                    FacilityRoom randomRoom = rooms[random.Next(rooms.Count)];
+                    events[1].RunEvent(null, ItemType.None, randomRoom, null);
+                }
+
+                delay = random.Next(config.MinBlackoutDelay, config.MaxBlackoutDelay);
+                Log.Info("delay: " + delay + ", min: " + config.MinBlackoutDelay + ", max: " + config.MaxBlackoutDelay);
+                yield return Timing.WaitForSeconds(random.Next(config.MinBlackoutDelay, config.MaxBlackoutDelay));
+            }
+        }
+
     }
 }
