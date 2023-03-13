@@ -11,13 +11,19 @@ using UnityEngine;
 using Random = System.Random;
 using InventorySystem;
 using InventorySystem.Items.Pickups;
+using PlayerRoles;
+using PlayerStatsSystem;
+using Mirror;
+using MapGeneration;
+using Footprinting;
+using System.Diagnostics;
 
 namespace RandomFacilityEvents.Plugin
 {
     internal class Plugin
     {
         //Variables
-        private Random random = new Random();
+        private readonly Random random = new Random();
 
         //Config variable
         [PluginConfig]
@@ -50,7 +56,7 @@ namespace RandomFacilityEvents.Plugin
                     {
                         FacilityRoom room = rooms[random.Next(rooms.Count)];
 
-
+                        SpawnAccidentAtRoom(ItemType.GunE11SR, room);
                         SpawnItemAtRoom(ItemType.KeycardGuard, room);
                     }
 
@@ -67,11 +73,39 @@ namespace RandomFacilityEvents.Plugin
 
             if (itemPickup != null)
             {
-                itemPickup.transform.position = room.Position;
-                itemPickup.transform.rotation = Quaternion.identity + Quaternion.EulerRotation(Random.);
+                itemPickup.transform.position = room.Position + Vector3.up * 2;
+                itemPickup.transform.rotation = Quaternion.Euler(random.Next(360), 0, 0);
+
+                Log.Info("Spawned " + itemType + " at " + room.Position + " which is "  + room.Identifier);
             }
 
-            Log.Info("Spawned " + itemType + " at " + room.Position + " which is "  + room.Identifier);
+        }
+
+        //Spawn item with dead body at specified room location
+        private void SpawnAccidentAtRoom(ItemType itemType, FacilityRoom room)
+        {
+            try
+            {
+                SpawnItemAtRoom(itemType, room);
+
+                Log.Info("Player info: ");
+
+                Log.Info("Obj info: ");
+
+                Log.Info("Spawned a dead body at " + room.Position + " which is at " + room.Identifier);
+            } catch(Exception ex)
+            {
+                Log.Info(ex.ToString());
+
+                // Get stack trace for the exception with source file information
+                var st = new StackTrace(ex, true);
+                // Get the top stack frame
+                var frame = st.GetFrame(0);
+                // Get the line number from the stack frame
+                var line = frame.GetFileLineNumber();
+
+                Log.Info("Exception at: " + line);
+            }
         }
     }
 }
