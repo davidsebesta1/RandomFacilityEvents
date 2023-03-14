@@ -26,8 +26,8 @@ namespace RandomFacilityEvents.Plugin
             Log.Info("RoomBlackoutEvent has started");
             var flickerControllerInstances = FlickerableLightController.Instances;
 
-            Cassie.Message(".g2", isHeld: false);
-            if (room != null) // room is specified
+            Cassie.Message(".g2", isHeld: true);
+            if (room != null && config.DoorRandomizationOnBlackout) // room is specified
             {
                 foreach (FlickerableLightController fl in flickerControllerInstances)
                 {
@@ -43,14 +43,40 @@ namespace RandomFacilityEvents.Plugin
 
                             if (closeAllDoors)
                             {
-                                //TODO: close whole room doors
+                                Log.Info("RoomBlackoutEventPlus: Closed all doors in " + room.Identifier);
+                                HashSet<DoorVariant> doors = DoorVariant.AllDoors;
+                                foreach(DoorVariant door2 in doors){
+                                    foreach(RoomIdentifier identifier in door2.Rooms)
+                                    {
+                                        if(identifier == room.Identifier)
+                                        {
+                                            door2.NetworkTargetState = false;
+                                            break;
+                                        }
+                                    }
+                                }
                             } else
                             {
-                                //TODO: close only some doors
-                             }
+                                Log.Info("RoomBlackoutEventPlus: only some rooms in " + room.Identifier);
+                                HashSet<DoorVariant> doors = DoorVariant.AllDoors;
+                                foreach (DoorVariant door2 in doors)
+                                {
+                                    foreach (RoomIdentifier identifier in door2.Rooms)
+                                    {
+                                        if (identifier == room.Identifier)
+                                        {
+                                            if(Convert.ToBoolean(Random.Range(0, 1)))
+                                            {
+                                                door2.NetworkTargetState = false;
+                                            }
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
                         }
 
-                        Log.Info("Specified blackout in " + room.Identifier);
+                        Log.Info("RoomBlackoutEventPlus: blackout in " + room.Identifier + " ,no doors closed");
                         return true; // turned lights off
                     }
                 }

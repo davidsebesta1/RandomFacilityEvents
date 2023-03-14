@@ -66,15 +66,17 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BaseFacilityEvent.cs" />
+    <Compile Include="Events\BaseFacilityEvent.cs" />
     <Compile Include="Config.cs" />
-    <Compile Include="DoorCloseEvent.cs" />
+    <Compile Include="Events\BasicEvents\DoorCloseEvent.cs" />
+    <Compile Include="Events\BasicEvents\DoorLockdownEvent.cs" />
+    <Compile Include="Events\BasicEvents\DoorOpenEvent.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RandomItemEvent.cs" />
-    <Compile Include="RoomBlackoutEvent.cs" />
-    <Compile Include="RoomBlackoutEventPlus.cs" />
-    <Compile Include="ZoneBlackoutEvent.cs" />
+    <Compile Include="Events\BasicEvents\RandomItemEvent.cs" />
+    <Compile Include="Events\BasicEvents\RoomBlackoutEvent.cs" />
+    <Compile Include="Events\AdvancedEvents\RoomBlackoutEventPlus.cs" />
+    <Compile Include="Events\AdvancedEvents\ZoneBlackoutEvent.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

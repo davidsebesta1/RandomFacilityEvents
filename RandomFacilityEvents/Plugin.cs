@@ -18,13 +18,15 @@ using MapGeneration;
 using Footprinting;
 using System.Diagnostics;
 using RandomFacilityEvents.Plugins;
+using Interactables.Interobjects.DoorUtils;
+using PluginAPI.Core.Doors;
+using System.Linq;
 
 namespace RandomFacilityEvents.Plugin
 {
     internal class Plugin
     {
         //Variables
-        private readonly Random random = new Random();
         private Dictionary<int, BaseFacilityEvent> events = new Dictionary<int, BaseFacilityEvent>();
 
         //Config variable
@@ -32,7 +34,7 @@ namespace RandomFacilityEvents.Plugin
         public Config config;
 
         //Entry point
-        [PluginEntryPoint("RandomFacilityEvents", "0.0.1", "Spawns random events around facility", "davidsebesta")]
+        [PluginEntryPoint("RandomFacilityEvents", "0.0.2", "Spawns random events around facility", "davidsebesta")]
         public void Startup()
         {
             Log.Info("RandomFacilityEvents plugin is " + (config.IsEnabled ? "enabled" : "disabled"));
@@ -43,12 +45,23 @@ namespace RandomFacilityEvents.Plugin
                 events.Add(0, new RandomItemEvent(config));
                 events.Add(1, new RoomBlackoutEvent(config));
                 events.Add(2, new ZoneBlackoutEvent(config));
+                events.Add(3, new RoomBlackoutEventPlus(config));
+                events.Add(4, new DoorCloseEvent(config));
+                events.Add(5, new DoorLockdownEvent(config));
             }
         }
 
         //Round started method
         [PluginEvent(ServerEventType.RoundStart)]
         public void RoundStart()
+        {
+            InitializeStartingSpawnItems();
+
+            InitializeBlackoutEvents();
+            
+        }
+
+        private void InitializeStartingSpawnItems()
         {
             //Random items spawn
             if (config.RandomItemSpawn)
@@ -68,14 +81,27 @@ namespace RandomFacilityEvents.Plugin
                 }));
 
             }
+        }
 
-
+        private void InitializeBlackoutEvents()
+        {
             //Room related blackout coroutine
-            if(config.RandomRoomBlackouts || config.RandomZoneBlackouts)
+            if (config.RandomRoomBlackouts || config.RandomZoneBlackouts)
             {
-                Timing.CallDelayed(1f, (Action)(() =>
+                Timing.CallDelayed(2f, (Action)(() =>
                 {
                     Timing.RunCoroutine(RandomBlackoutEnumerator());
+                }));
+            }
+        }
+
+        private void InitializeDoorEvents()
+        {
+            if (config.RandomDoorMalfunctions)
+            {
+                Timing.CallDelayed(3f, (Action)(() =>
+                {
+                    Timing.RunCoroutine(RandomDoorMalfunctionEvent());
                 }));
             }
         }
@@ -101,7 +127,8 @@ namespace RandomFacilityEvents.Plugin
 
                     if (commenceZoneWideBlackout) // randomly zone blackouts
                     {
-                        events[2].RunEvent();
+                        FacilityRoom randomRoom = rooms[Random.Range(0, rooms.Count)];
+                        events[2].RunEvent(room: randomRoom);
                     } else if (config.RandomRoomBlackouts) // randomly room blackouts
                     {
                         FacilityRoom randomRoom = rooms[Random.Range(0, rooms.Count)];
@@ -117,6 +144,26 @@ namespace RandomFacilityEvents.Plugin
                 delay = Random.Range(config.MinBlackoutDelay, config.MaxBlackoutDelay);
                 Log.Info("delay: " + delay + ", min: " + config.MinBlackoutDelay + ", max: " + config.MaxBlackoutDelay);
                 yield return Timing.WaitForSeconds(Random.Range(config.MinBlackoutDelay, config.MaxBlackoutDelay));
+            }
+        }
+
+        private IEnumerator<float> RandomDoorMalfunctionEvent()
+        {
+            yield return Timing.WaitForSeconds(config.InitialDoorMalfunctionDelay);
+
+            while (config.RandomDoorMalfunctions)
+            {
+                bool commenceDoorLockMalfunction = Random.Range(0, 10) > 6;
+
+                if(commenceDoorLockMalfunction)
+                {
+                    events[5].RunEvent(door: FacilityDoor.List[Random.Range(0, FacilityDoor.List.Count)]);
+                } else
+                {
+                    events[4].RunEvent(door: FacilityDoor.List[Random.Range(0, FacilityDoor.List.Count)]);
+                }
+
+                yield return Timing.WaitForSeconds(Random.Range(config.MinMalfunctionDelay, config.MaxMalfunctionDelay));
             }
         }
 
