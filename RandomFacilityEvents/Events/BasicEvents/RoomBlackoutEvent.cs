@@ -25,7 +25,7 @@ namespace RandomFacilityEvents.Plugin
             Log.Info("RoomBlackoutEvent has started");
             var flickerControllerInstances = FlickerableLightController.Instances;
 
-            Cassie.Message(".g2", isHeld: true);
+            Cassie.Message(".g2", isHeld: false, isNoisy: false);
             if (room != null) // room is specified
             {
                 foreach (FlickerableLightController fl in flickerControllerInstances)

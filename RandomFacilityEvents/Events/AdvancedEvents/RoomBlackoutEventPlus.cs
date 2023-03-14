@@ -74,6 +74,9 @@ namespace RandomFacilityEvents.Plugin
                                     }
                                 }
                             }
+                        } else
+                        {
+                            Log.Info("Blackout in " + room.Identifier);
                         }
 
                         Log.Info("RoomBlackoutEventPlus: blackout in " + room.Identifier + " ,no doors closed");

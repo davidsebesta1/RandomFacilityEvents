@@ -9,6 +9,7 @@ using MEC;
 using UnityEngine;
 using Random = UnityEngine.Random;
 using PluginAPI.Core.Doors;
+using CommandSystem.Commands.RemoteAdmin;
 
 namespace RandomFacilityEvents.Plugin
 {
@@ -65,7 +66,7 @@ namespace RandomFacilityEvents.Plugin
                         CallDelayedBy = 13f;
                         Timing.CallDelayed(CallDelayedBy, (Action)(() =>
                         {
-                        KillLightsInZone(MapGeneration.FacilityZone.Entrance);
+                            KillLightsInZone(MapGeneration.FacilityZone.Entrance);
                         }));
                         break;
                     case 3:
@@ -99,7 +100,6 @@ namespace RandomFacilityEvents.Plugin
                 if(fl.Room.Zone == zone)
                 {
                     fl.ServerFlickerLights(config.ZoneBlackoutTime);
-                    break;
                 }
             }
         }
